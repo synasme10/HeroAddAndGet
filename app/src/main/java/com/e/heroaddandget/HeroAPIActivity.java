@@ -5,6 +5,7 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.StrictMode;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v4.content.CursorLoader;
@@ -20,9 +21,15 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 
 import HeroAPI.HeroAPI;
 import URL.BaseUrl;
+import model.ImageResponse;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -34,6 +41,7 @@ public class HeroAPIActivity extends AppCompatActivity {
     EditText Etname,Etdesc;
     Button BtnHero;
     ImageView Imgheroimage;
+    String imagePath, imageName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,7 +86,7 @@ public class HeroAPIActivity extends AppCompatActivity {
 
         Uri uri=data.getData();
         String imagePath=getRealPathFromUri(uri);
-        previewImage(imagePath  );
+        previewImage(imagePath);
     }
 
     private void previewImage(String imagePath) {
@@ -99,13 +107,38 @@ public class HeroAPIActivity extends AppCompatActivity {
         cursor.close();
         return result;
     }
-    //
 
-//    private void StrictMode(){
-//        android.os.StrictMode.ThreadPolicy policy=new android.os.StrictMode.ThreadPolicy.Builder().permitAll().build();
-//        android.os.StrictMode.setThreadPolicy(policy);
-//    }
-//
+
+    private void StrictMode(){
+        StrictMode.ThreadPolicy policy=new StrictMode.ThreadPolicy.Builder().permitAll().build();
+  StrictMode.setThreadPolicy(policy);
+    }
+
+    private void SaveImageOnly(){
+
+        File file=new File(imagePath);
+
+        RequestBody requestBody=RequestBody.create(MediaType.parse("multipart/form-data"),file);
+        MultipartBody.Part body=MultipartBody.Part.createFormData("imageFile",file.getName(),requestBody);
+
+        HeroAPI heroAPI=BaseUrl.getInstance().create(HeroAPI.class);
+        Call<ImageResponse> responseBodyCall=heroAPI.uploadImage(body);
+
+        StrictMode();
+
+        try{
+            Response<ImageResponse> imageResponseResponse=responseBodyCall.execute();
+
+            String imageName=imageResponseResponse.body().getFilename();
+        }
+        catch (IOException e){
+            Toast.makeText(this, "Error", Toast.LENGTH_SHORT).show();
+            e.printStackTrace();
+        }
+    }
+
+
+
 //    private void loadFromURL() {
 //StrictMode();
 //try {
@@ -118,16 +151,16 @@ public class HeroAPIActivity extends AppCompatActivity {
 //    }
 
     private void Add() {
-
+        SaveImageOnly();
         String name=Etname.getText().toString();
         String desc=Etdesc.getText().toString();
-        Retrofit retrofit=new Retrofit.Builder()
-                .baseUrl(BaseUrl.Base_Url)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
+        Map<String,String> map=new HashMap<>();
+        map.put("name",name);
+        map.put("desc",desc);
+        map.put("image",imageName);
 
-        HeroAPI heroAPI=retrofit.create(HeroAPI.class);
-        Call<Void> heroesCall=heroAPI.addHero(name,desc);
+        HeroAPI heroAPI=BaseUrl.getInstance().create(HeroAPI.class);
+        Call<Void> heroesCall=heroAPI.addHero(map);
 
         heroesCall.enqueue(new Callback<Void>() {
             @Override
@@ -147,5 +180,9 @@ public class HeroAPIActivity extends AppCompatActivity {
 
             }
         });
+
+        Intent intent=new Intent(HeroAPIActivity.this,HeroViewActivity.class);
+        startActivity(intent);
+        finish();
     }
 }
