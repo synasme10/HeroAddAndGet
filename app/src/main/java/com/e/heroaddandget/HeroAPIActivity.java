@@ -85,14 +85,14 @@ public class HeroAPIActivity extends AppCompatActivity {
         }
 
         Uri uri=data.getData();
-        String imagePath=getRealPathFromUri(uri);
+        imagePath=getRealPathFromUri(uri);
         previewImage(imagePath);
     }
 
     private void previewImage(String imagePath) {
-        File imgfile=new File(imagePath);
-        if (imgfile.exists()){
-            Bitmap mybitmap=BitmapFactory.decodeFile(imgfile.getAbsolutePath());
+        File imgFile=new File(imagePath);
+        if (imgFile.exists()){
+            Bitmap mybitmap=BitmapFactory.decodeFile(imgFile.getAbsolutePath());
             Imgheroimage.setImageBitmap(mybitmap);
         }
     }
@@ -123,13 +123,10 @@ public class HeroAPIActivity extends AppCompatActivity {
 
         HeroAPI heroAPI=BaseUrl.getInstance().create(HeroAPI.class);
         Call<ImageResponse> responseBodyCall=heroAPI.uploadImage(body);
-
         StrictMode();
-
         try{
             Response<ImageResponse> imageResponseResponse=responseBodyCall.execute();
-
-            String imageName=imageResponseResponse.body().getFilename();
+            imageName=imageResponseResponse.body().getFilename();
         }
         catch (IOException e){
             Toast.makeText(this, "Error", Toast.LENGTH_SHORT).show();
@@ -154,7 +151,7 @@ public class HeroAPIActivity extends AppCompatActivity {
         SaveImageOnly();
         String name=Etname.getText().toString();
         String desc=Etdesc.getText().toString();
-        Map<String,String> map=new HashMap<>();
+        Map<String, String> map=new HashMap<>();
         map.put("name",name);
         map.put("desc",desc);
         map.put("image",imageName);

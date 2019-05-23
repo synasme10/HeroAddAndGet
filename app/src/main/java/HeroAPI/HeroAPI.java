@@ -19,17 +19,17 @@ public interface HeroAPI {
 
     @FormUrlEncoded
     @POST("heroes")
-    Call<Void> addHero(@Field("name") String name,@Field("desc") String desc);
+    Call<Void> addHero(@Field("name") String name, @Field("desc") String desc);
 
     //Using Fieldmap
- @FormUrlEncoded
- @POST("heroes")
-    Call<Void> addHero(@FieldMap Map<String,String> map);
+    @FormUrlEncoded
+    @POST("heroes")
+    Call<Void> addHero(@FieldMap Map<String, String> map);
 
- @Multipart
+    @Multipart
     @POST("upload")
     Call<ImageResponse> uploadImage(@Part MultipartBody.Part img);
 
- @GET("heroes")
+    @GET("heroes")
     Call<List<Heroesmodel>> getAllHeroes();
 }

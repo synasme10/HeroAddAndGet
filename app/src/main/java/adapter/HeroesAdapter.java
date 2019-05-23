@@ -26,7 +26,10 @@ public class HeroesAdapter extends RecyclerView.Adapter<HeroesAdapter.HeroesView
 private List<Heroesmodel> heroesList;
 private Context context;
 
-
+    public HeroesAdapter(List<Heroesmodel> heroesList, Context context) {
+        this.heroesList = heroesList;
+        this.context = context;
+    }
 
     @NonNull
     @Override
