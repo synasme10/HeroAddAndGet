@@ -32,4 +32,12 @@ public interface HeroAPI {
 
     @GET("heroes")
     Call<List<Heroesmodel>> getAllHeroes();
+
+    @FormUrlEncoded
+    @POST("users/login")
+    Call<LoginSignupResponse> CheckUser(@Field("username") String username,@Field("password") String password);
+
+    @FormUrlEncoded
+    @POST("users/signup")
+    Call<LoginSignupResponse> registerUser(@Field("username") String username,@Field("password") String password);
 }

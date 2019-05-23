@@ -1,0 +1,4 @@
+package HeroAPI;
+
+class LoginSignupResponse {
+}
